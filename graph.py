@@ -1,7 +1,6 @@
 from __future__ import annotations
 from random import randint
 
-
 class GraphError(Exception):
     pass
 
@@ -114,8 +113,8 @@ def read_graph_from_file(filename: str, g: DirectedGraph) -> None:
             g.add_edge(vertex1, vertex2, cost)
 
 def write_graph_to_file(filename: str, g: DirectedGraph) -> None:
-    print(f"{g.vertice_count(), g.edge_count()}")
     with open(filename, "w") as f:
+        print(f"{g.vertice_count()} {g.edge_count()}", file = f)
         for vertex1 in range(g.vertice_count()):
             for vertex2 in g.outbound(vertex1):
                 print(f"{vertex1} {vertex2} {g.get_cost(vertex1, vertex2)}", file = f)
