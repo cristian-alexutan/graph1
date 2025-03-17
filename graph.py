@@ -6,12 +6,6 @@ class GraphError(Exception):
 
 class DirectedGraph:
     def __init__(self, v = None, d_in = None, d_out = None, costs = None):
-        if isinstance(v, int):
-            for i in range(v):
-                self.add_vertex(i)
-        elif isinstance(v, list):
-            for i in v:
-                self.add_vertex(i)
         if d_in is None:
             self._d_in = {}
         else:
@@ -24,11 +18,19 @@ class DirectedGraph:
             self._costs = {}
         else:
             self._costs = costs
+        if isinstance(v, int):
+            for i in range(v):
+                self.add_vertex(i)
+        elif isinstance(v, list):
+            for i in v:
+                self.add_vertex(i)
 
-    def add_vertex(self, vertex: int) -> None:
+    def add_vertex(self, vertex: int) -> bool:
         if vertex not in self._d_in:
             self._d_in[vertex] = []
             self._d_out[vertex] = []
+            return True
+        return False
 
     def remove_vertex(self, vertex: int) -> None:
         if vertex not in self._d_in:
@@ -102,26 +104,24 @@ class DirectedGraph:
         costs_copy = self._costs.copy()
         return DirectedGraph(None, in_copy, out_copy, costs_copy)
 
-def read_graph_from_file(filename: str, g: DirectedGraph) -> None:
+def read_graph_from_file(filename: str) -> DirectedGraph:
     with open(filename, "r") as f:
         lines = f.readlines()
-        first = True
+        line1 = lines.pop(0)
+        line1.strip()
+        tokens = line1.split()
+        vertices = int(tokens[0])
+        g = DirectedGraph(vertices)
         for line in lines:
             line = line.strip()
             if line == "":
-                continue
-            if first:
-                first = False
-                tokens = line.split()
-                vertex_count = int(tokens[0])
-                for i in range(vertex_count):
-                    g.add_vertex(i)
                 continue
             tokens = line.split()
             vertex1 = int(tokens[0])
             vertex2 = int(tokens[1])
             cost = int(tokens[2])
             g.add_edge(vertex1, vertex2, cost)
+        return g
 
 def write_graph_to_file(filename: str, g: DirectedGraph) -> None:
     with open(filename, "w") as f:
