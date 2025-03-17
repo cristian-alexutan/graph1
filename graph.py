@@ -5,7 +5,13 @@ class GraphError(Exception):
     pass
 
 class DirectedGraph:
-    def __init__(self, d_in = None, d_out = None, costs = None):
+    def __init__(self, v = None, d_in = None, d_out = None, costs = None):
+        if isinstance(v, int):
+            for i in range(v):
+                self.add_vertex(i)
+        elif isinstance(v, list):
+            for i in v:
+                self.add_vertex(i)
         if d_in is None:
             self._d_in = {}
         else:
@@ -32,27 +38,32 @@ class DirectedGraph:
             self._d_in[out].remove(vertex)
         self._d_out.pop(vertex)
 
-    def add_edge(self, vertex1: int, vertex2: int, cost: int) -> None:
+    def add_edge(self, vertex1: int, vertex2: int, cost: int) -> bool:
         if vertex1 not in self._d_in:
             self.add_vertex(vertex1)
         if vertex2 not in self._d_in:
             self.add_vertex(vertex2)
         if (vertex1, vertex2) in self._costs:
-            raise GraphError("edge already exists")
+            return False
         self._costs[(vertex1, vertex2)] = cost
         self._d_out[vertex1].append(vertex2)
         self._d_in[vertex2].append(vertex1)
+        return True
 
     def remove_edge(self, vertex1: int, vertex2: int) -> None:
         if (vertex1, vertex2) not in self._costs:
             raise GraphError("edge does not exist")
         self._costs.pop((vertex1, vertex2))
+        self._d_out[vertex1].remove(vertex2)
+        self._d_in[vertex2].remove(vertex1)
 
     def vertices(self) -> iter:
         return iter(self._d_in.keys())
 
     def is_edge(self, vertex1: int, vertex2: int) -> bool:
-        return vertex2 in self._d_in[vertex1]
+        if vertex2 in self._d_out[vertex1]:
+            return True
+        return False
 
     def in_degree(self, vertex: int) -> int:
         if vertex not in self._d_in:
@@ -89,7 +100,7 @@ class DirectedGraph:
         in_copy = self._d_in.copy()
         out_copy = self._d_out.copy()
         costs_copy = self._costs.copy()
-        return DirectedGraph(in_copy, out_copy, costs_copy)
+        return DirectedGraph(None, in_copy, out_copy, costs_copy)
 
 def read_graph_from_file(filename: str, g: DirectedGraph) -> None:
     with open(filename, "r") as f:
@@ -120,12 +131,16 @@ def write_graph_to_file(filename: str, g: DirectedGraph) -> None:
                 print(f"{vertex1} {vertex2} {g.get_cost(vertex1, vertex2)}", file = f)
 
 def random_graph(vertices: int, edges: int) -> DirectedGraph:
+    if edges > vertices ** 2:
+        raise GraphError(f"can't create graph with {vertices} vertices and {edges} edges")
     g = DirectedGraph()
     for i in range(vertices):
         g.add_vertex(i)
-    for i in range(edges):
+    count = 0
+    while count < edges:
         vertex1 = randint(0, g.vertice_count() - 1)
         vertex2 = randint(0, g.vertice_count() - 1)
         cost = randint(-100, 100)
-        g.add_edge(vertex1, vertex2, cost)
+        rez = g.add_edge(vertex1, vertex2, cost)
+        count += rez
     return g
