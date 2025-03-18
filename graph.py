@@ -93,10 +93,15 @@ class DirectedGraph:
             raise GraphError("vertex does not exist")
         return iter(self._d_in[vertex])
 
-    def get_cost(self, vertex1: int, vertex2: int):
+    def get_cost(self, vertex1: int, vertex2: int) -> int:
         if (vertex1, vertex2) not in self._costs:
             raise GraphError("edge does not exist")
         return self._costs[(vertex1, vertex2)]
+
+    def modify_cost(self, vertex1: int, vertex2: int, cost: int) -> None:
+        if (vertex1, vertex2) not in self._costs:
+            raise GraphError("vertex does not exist")
+        self._costs[(vertex1, vertex2)] = cost
 
     def copy_graph(self) -> DirectedGraph:
         in_copy = self._d_in.copy()
