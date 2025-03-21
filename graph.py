@@ -38,7 +38,8 @@ class DirectedGraph:
         for out in self._d_out[vertex]:
             self._costs.pop(vertex, out)
             self._d_in[out].remove(vertex)
-        self._d_out.pop(vertex)
+        self._d_in.pop(vertex, None)
+        self._d_out.pop(vertex, None)
 
     def add_edge(self, vertex1: int, vertex2: int, cost: int) -> bool:
         if vertex1 not in self._d_in:
@@ -63,6 +64,8 @@ class DirectedGraph:
         return iter(self._d_in.keys())
 
     def is_edge(self, vertex1: int, vertex2: int) -> bool:
+        if vertex1 not in self._d_in.keys() or vertex2 not in self._d_in.keys():
+            return False
         if vertex2 in self._d_out[vertex1]:
             return True
         return False
@@ -114,9 +117,17 @@ def read_graph_from_file(filename: str) -> DirectedGraph:
         lines = f.readlines()
         line1 = lines.pop(0)
         line1.strip()
-        tokens = line1.split()
-        vertices = int(tokens[0])
-        g = DirectedGraph(vertices)
+        if line1 == "nodelist":
+            line1 = lines.pop(0)
+            line1.strip()
+            nodes = line1.split()
+            for node in nodes:
+                node = int(node)
+            g = DirectedGraph(node)
+        else:
+            tokens = line1.split()
+            vertices = int(tokens[0])
+            g = DirectedGraph(vertices)
         for line in lines:
             line = line.strip()
             if line == "":
@@ -130,8 +141,12 @@ def read_graph_from_file(filename: str) -> DirectedGraph:
 
 def write_graph_to_file(filename: str, g: DirectedGraph) -> None:
     with open(filename, "w") as f:
-        print(f"{g.vertice_count()} {g.edge_count()}", file = f)
-        for vertex1 in range(g.vertice_count()):
+        print("nodelist", file = f)
+        nodes = ""
+        for x in g.vertices():
+            nodes = nodes + f"{x} "
+        print(nodes, file = f)
+        for vertex1 in g.vertices():
             for vertex2 in g.outbound(vertex1):
                 print(f"{vertex1} {vertex2} {g.get_cost(vertex1, vertex2)}", file = f)
 
