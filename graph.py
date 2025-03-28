@@ -35,17 +35,21 @@ class DirectedGraph:
         if vertex not in self._d_in:
             raise GraphError("vertex not found")
         for out in self._d_out[vertex]:
-            self._costs.pop(vertex, out)
+            self._costs.pop((vertex, out), None)
             self._d_in[out].remove(vertex)
+        for node in self._d_in[vertex]:
+            self._costs.pop((node, vertex), None)
+            self._d_out[node].remove(vertex)
         self._d_in.pop(vertex, None)
         self._d_out.pop(vertex, None)
 
     def add_edge(self, vertex1: int, vertex2: int, cost: int) -> bool:
         if vertex1 not in self._d_in:
-            self.add_vertex(vertex1)
+            raise GraphError("vertex doesn't exist")
         if vertex2 not in self._d_in:
-            self.add_vertex(vertex2)
+            raise GraphError("vertex doesn't exist")
         if (vertex1, vertex2) in self._costs:
+            self._costs[(vertex1, vertex2)] = cost
             return False
         self._costs[(vertex1, vertex2)] = cost
         self._d_out[vertex1].append(vertex2)
@@ -53,7 +57,7 @@ class DirectedGraph:
         return True
 
     def remove_edge(self, vertex1: int, vertex2: int) -> None:
-        if (vertex1, vertex2) not in self._costs:
+        if (vertex1, vertex2) not in self._costs.keys():
             raise GraphError("edge does not exist")
         self._costs.pop((vertex1, vertex2))
         self._d_out[vertex1].remove(vertex2)
@@ -112,10 +116,16 @@ class DirectedGraph:
         return DirectedGraph(None, in_copy, out_copy, costs_copy)
 
 def read_graph_from_file(filename: str) -> "DirectedGraph":
+    try:
+        f = open(filename, "r")
+    except FileNotFoundError:
+        raise GraphError(f"file {filename} not found")
     with open(filename, "r") as f:
         lines = f.readlines()
         line1 = lines.pop(0)
-        line1.strip()
+        line1 = line1.strip()
+        print(line1)
+        print(line1 == "nodelist")
         if line1 == "nodelist":
             line1 = lines.pop(0)
             line1.strip()
