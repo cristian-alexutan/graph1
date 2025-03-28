@@ -1,4 +1,3 @@
-from __future__ import annotations
 from random import randint
 
 class GraphError(Exception):
@@ -106,13 +105,13 @@ class DirectedGraph:
             raise GraphError("vertex does not exist")
         self._costs[(vertex1, vertex2)] = cost
 
-    def copy_graph(self) -> DirectedGraph:
+    def copy_graph(self) -> "DirectedGraph":
         in_copy = self._d_in.copy()
         out_copy = self._d_out.copy()
         costs_copy = self._costs.copy()
         return DirectedGraph(None, in_copy, out_copy, costs_copy)
 
-def read_graph_from_file(filename: str) -> DirectedGraph:
+def read_graph_from_file(filename: str) -> "DirectedGraph":
     with open(filename, "r") as f:
         lines = f.readlines()
         line1 = lines.pop(0)
@@ -120,10 +119,11 @@ def read_graph_from_file(filename: str) -> DirectedGraph:
         if line1 == "nodelist":
             line1 = lines.pop(0)
             line1.strip()
-            nodes = line1.split()
-            for node in nodes:
-                node = int(node)
-            g = DirectedGraph(node)
+            tokens = line1.split()
+            nodes = []
+            for node in tokens:
+                nodes.append(int(node))
+            g = DirectedGraph(nodes)
         else:
             tokens = line1.split()
             vertices = int(tokens[0])
@@ -139,7 +139,7 @@ def read_graph_from_file(filename: str) -> DirectedGraph:
             g.add_edge(vertex1, vertex2, cost)
         return g
 
-def write_graph_to_file(filename: str, g: DirectedGraph) -> None:
+def write_graph_to_file(filename: str, g: "DirectedGraph") -> None:
     with open(filename, "w") as f:
         print("nodelist", file = f)
         nodes = ""
@@ -150,7 +150,7 @@ def write_graph_to_file(filename: str, g: DirectedGraph) -> None:
             for vertex2 in g.outbound(vertex1):
                 print(f"{vertex1} {vertex2} {g.get_cost(vertex1, vertex2)}", file = f)
 
-def random_graph(vertices: int, edges: int) -> DirectedGraph:
+def random_graph(vertices: int, edges: int) -> "DirectedGraph":
     if edges > vertices ** 2:
         raise GraphError(f"can't create graph with {vertices} vertices and {edges} edges")
     g = DirectedGraph()
