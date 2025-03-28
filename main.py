@@ -208,7 +208,7 @@ def main():
         opt = opt.strip()
         if opt == "0":
             break
-        elif opt == "1":
+        if opt == "1":
             index = select_graph(graphs, index)
             continue
         if opt not in options:
