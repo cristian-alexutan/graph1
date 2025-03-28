@@ -124,8 +124,6 @@ def read_graph_from_file(filename: str) -> "DirectedGraph":
         lines = f.readlines()
         line1 = lines.pop(0)
         line1 = line1.strip()
-        print(line1)
-        print(line1 == "nodelist")
         if line1 == "nodelist":
             line1 = lines.pop(0)
             line1.strip()
