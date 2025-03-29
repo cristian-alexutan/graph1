@@ -31,4 +31,5 @@ public:
     bool remove_edge(int from, int to);
     bool add_vertex(int vertex);
     bool remove_vertex(int vertex);
+    DirectedGraph copy_graph() const;
 };

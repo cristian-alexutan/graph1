@@ -117,3 +117,11 @@ bool DirectedGraph::remove_vertex(int vertex) {
     }
     return true;
 }
+
+DirectedGraph DirectedGraph::copy_graph() const {
+    DirectedGraph copy;
+    copy.d_in = d_in;
+    copy.d_out = d_out;
+    copy.costs = costs;
+    return copy;
+}
