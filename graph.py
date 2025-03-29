@@ -31,9 +31,9 @@ class DirectedGraph:
             return True
         return False
 
-    def remove_vertex(self, vertex: int) -> None:
+    def remove_vertex(self, vertex: int) -> bool:
         if vertex not in self._d_in:
-            raise GraphError("vertex not found")
+            return False
         for out in self._d_out[vertex]:
             self._costs.pop((vertex, out), None)
             self._d_in[out].remove(vertex)
@@ -42,6 +42,7 @@ class DirectedGraph:
             self._d_out[node].remove(vertex)
         self._d_in.pop(vertex, None)
         self._d_out.pop(vertex, None)
+        return True
 
     def add_edge(self, vertex1: int, vertex2: int, cost: int) -> bool:
         if vertex1 not in self._d_in:
@@ -56,12 +57,13 @@ class DirectedGraph:
         self._d_in[vertex2].append(vertex1)
         return True
 
-    def remove_edge(self, vertex1: int, vertex2: int) -> None:
+    def remove_edge(self, vertex1: int, vertex2: int) -> bool:
         if (vertex1, vertex2) not in self._costs.keys():
-            raise GraphError("edge does not exist")
+            return False
         self._costs.pop((vertex1, vertex2))
         self._d_out[vertex1].remove(vertex2)
         self._d_in[vertex2].remove(vertex1)
+        return True
 
     def vertices(self) -> iter:
         return iter(self._d_in.keys())
