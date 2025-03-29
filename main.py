@@ -128,10 +128,9 @@ def add_vertex(graphs: list, index: int):
 
 def remove_vertex(graphs: list, index: int):
     vertex = read_vertex()
-    try:
-        graphs[index][1].remove_vertex(vertex)
-    except GraphError as e:
-        print(e)
+    ans = graphs[index][1].remove_vertex(vertex)
+    if not ans:
+        print("vertex does not exist")
 
 def add_edge(graphs: list, index: int):
     vertex1, vertex2 = read_edge()
@@ -145,10 +144,9 @@ def add_edge(graphs: list, index: int):
 
 def remove_edge(graphs: list, index: int):
     vertex1, vertex2 = read_edge()
-    try:
-        graphs[index][1].remove_edge(vertex1, vertex2)
-    except GraphError as e:
-        print(e)
+    ans = graphs[index][1].remove_edge(vertex1, vertex2)
+    if not ans:
+        print("edge does not exist")
 
 def create_copy_of_graph(graphs: list, index: int):
     copy = graphs[index][1].copy_graph()
