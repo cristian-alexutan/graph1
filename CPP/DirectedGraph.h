@@ -11,12 +11,12 @@ private:
     std::map<std::pair<int, int>, int> costs;
 public:
     DirectedGraph() = default;
-    explicit DirectedGraph(const int vertex_count);
+    explicit DirectedGraph(int vertex_count);
     explicit DirectedGraph(std::vector<int> vertices);
     DirectedGraph(const DirectedGraph& other);
 
-    using VertexIterator = std::map<int, std::vector<int>>::iterator;
-    using EdgeIterator = std::vector<int>::iterator;
+    using VertexIterator = std::map<int, std::vector<int>>::const_iterator;
+    using EdgeIterator = std::vector<int>::const_iterator;
     int vertex_count() const;
     VertexIterator vertices_begin();
     VertexIterator vertices_end();

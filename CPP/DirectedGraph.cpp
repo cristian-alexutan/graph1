@@ -26,11 +26,11 @@ int DirectedGraph::vertex_count() const {
 }
 
 DirectedGraph::VertexIterator DirectedGraph::vertices_begin() {
-    return d_in.begin();
+    return d_in.cbegin();
 }
 
 DirectedGraph::VertexIterator DirectedGraph::vertices_end() {
-    return d_in.end();
+    return d_in.cend();
 }
 
 bool DirectedGraph::is_edge(int from, int to) const {
@@ -49,22 +49,22 @@ int DirectedGraph::out_degree(const int vertex) {
 
 DirectedGraph::EdgeIterator DirectedGraph::outbound_begin(int vertex) {
     if (d_out.count(vertex) == 0) throw std::out_of_range("Vertex not found");
-    return d_out[vertex].begin();
+    return d_out[vertex].cbegin();
 }
 
 DirectedGraph::EdgeIterator DirectedGraph::outbound_end(int vertex) {
     if (d_out.count(vertex) == 0) throw std::out_of_range("Vertex not found");
-    return d_out[vertex].end();
+    return d_out[vertex].cend();
 }
 
 DirectedGraph::EdgeIterator DirectedGraph::inbound_begin(int vertex) {
     if (d_in.count(vertex) == 0) throw std::out_of_range("Vertex not found");
-    return d_in[vertex].begin();
+    return d_in[vertex].cbegin();
 }
 
 DirectedGraph::EdgeIterator DirectedGraph::inbound_end(int vertex) {
     if (d_in.count(vertex) == 0) throw std::out_of_range("Vertex not found");
-    return d_in[vertex].end();
+    return d_in[vertex].cend();
 }
 
 int DirectedGraph::get_edge_cost(int from, int to) {
