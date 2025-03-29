@@ -1,6 +1,5 @@
 #include "DirectedGraph.h"
-#include <stdexcept>
-#include <algorithm>
+#include <iostream>
 
 DirectedGraph::DirectedGraph(const int vertex_count) {
     for (int i=0; i<vertex_count; i++) {
@@ -68,9 +67,9 @@ DirectedGraph::EdgeIterator DirectedGraph::inbound_end(int vertex) {
     return d_in[vertex].end();
 }
 
-int DirectedGraph::get_edge_cost(int from, int to) const {
+int DirectedGraph::get_edge_cost(int from, int to) {
     if (costs.count({from, to}) == 0) throw std::out_of_range("Edge not found");
-    return costs.at({from, to});
+    return costs[{from, to}];
 }
 
 void DirectedGraph::modify_edge_cost(int from, int to, int cost) {
@@ -80,7 +79,7 @@ void DirectedGraph::modify_edge_cost(int from, int to, int cost) {
 
 bool DirectedGraph::add_edge(int from, int to, int cost) {
     if (d_in.count(from) == 0 || d_out.count(to) == 0) throw std::out_of_range("Vertex not found");
-    if (costs.count({from, to}) == 0) {
+    if (costs.count({from, to}) > 0) {
         costs[{from, to}] = cost;
         return false;
     }
