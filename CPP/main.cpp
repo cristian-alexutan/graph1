@@ -188,8 +188,10 @@ void create_random_graph(std::vector<std::pair<std::string, DirectedGraph>>& gra
     int vertex_count, edge_count;
     std::cout << "vertex count: "; std::cin >> vertex_count;
     std::cout << "edge count: "; std::cin >> edge_count;
+    std::string graph_name;
+    std::cout << "graph name: "; std::cin >> graph_name;
     try {
-        graphs.emplace_back("random_"+std::to_string(vertex_count)+"_"+std::to_string(edge_count), generate_random_graph(vertex_count, edge_count));
+        graphs.emplace_back(graph_name, generate_random_graph(vertex_count, edge_count));
     }
     catch (std::exception& e) {
         std::cout << "error creating random graph: " << e.what() << "\n";
@@ -286,8 +288,8 @@ void run_ui() {
 }
 
 int main() {
-    test_graph();
-    std::cout << "tests ran succesfully\n\n";
+    //test_graph();
+    //std::cout << "tests ran succesfully\n\n";
     run_ui();
     system("pause");
     return 0;
