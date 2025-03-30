@@ -1,6 +1,7 @@
 #include "DirectedGraph.h"
 #include <iostream>
 #include <fstream>
+#include <random>
 #include <sstream>
 
 DirectedGraph::DirectedGraph(const int vertex_count) {
@@ -178,15 +179,18 @@ void write_graph_to_file(DirectedGraph &graph, const std::string &filename) {
     }
 }
 
+std::random_device rd;
+
 DirectedGraph generate_random_graph(const int& vertex_count, const int& edge_count) {
     if(edge_count > vertex_count * vertex_count)
         throw std::logic_error("Too many edges");
     DirectedGraph g(vertex_count);
-    for (int i = 0; i < edge_count; ++i) {
-        int from = rand() % vertex_count;
-        int to = rand() % vertex_count;
-        int cost = rand() % 100 + 1;
-        g.add_edge(from, to, cost);
+    int cnt = 0;
+    while(cnt < edge_count) {
+        int from = rd() % vertex_count;
+        int to = rd() % vertex_count;
+        int cost = rd() % 100 + 1;
+        cnt += g.add_edge(from, to, cost);
     }
     return g;
 }
