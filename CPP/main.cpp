@@ -1,8 +1,10 @@
 #include <iostream>
 #include "DirectedGraph.h"
 #include "test_graph.h"
+#include "stdexcept"
 
 void print_menu() {
+    std::cout << "\n";
     std::cout << "1 - select graph\n";
     std::cout << "2 - get number of vertices\n";
     std::cout << "3 - parse vertices\n";
@@ -30,7 +32,7 @@ int switch_graph(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int
     for (int i = 0; i < graphs.size(); ++i) {
         std::cout << i << " - " << graphs[i].first << "\n";
     }
-    std::cout << "enter index of desired graph";
+    std::cout << "enter index of desired graph: ";
     std::cin >> index;
     if (index < 0 || index >= graphs.size()) {
         std::cout << "Invalid index\n";
@@ -44,10 +46,154 @@ void get_number_of_vertices(std::vector<std::pair<std::string, DirectedGraph>>& 
 }
 
 void parse_vertices(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
-    std::cout << "vertices: ";
+    std::cout << "vertices:\n";
     for (auto it = graphs[index].second.vertices_begin(); it != graphs[index].second.vertices_end(); ++it)
         std::cout << *it << "\n";
     std::cout << "\n";
+}
+
+void check_if_edge_exists(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int from, to;
+    std::cout << "vertex1: "; std::cin >> from;
+    std::cout << "vertex2: "; std::cin >> to;
+    if (graphs[index].second.is_edge(from, to)) std::cout << "edge exists\n";
+    else std::cout << "edge does not exist\n";
+}
+
+void get_degrees(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int vertex;
+    std::cout << "vertex: "; std::cin >> vertex;
+    try {
+        int in_degree = graphs[index].second.in_degree(vertex);
+        int out_degree = graphs[index].second.out_degree(vertex);
+        std::cout << "in degree: " << in_degree << "\n";
+        std::cout << "out degree: " << out_degree << "\n";
+    } catch (std::out_of_range& e) {
+        std::cout << "vertex does not exist\n";
+    }
+}
+
+void parse_outbound(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int vertex;
+    std::cout << "vertex: "; std::cin >> vertex;
+    try {
+        std::cout << "outbound edges:\n";
+        for (auto it = graphs[index].second.outbound_begin(vertex); it != graphs[index].second.outbound_end(vertex); ++it)
+            std::cout << *it << "\n";
+        std::cout << "\n";
+    } catch (std::out_of_range& e) {
+        std::cout << "vertex does not exist\n";
+    }
+}
+
+void parse_inbound(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int vertex;
+    std::cout << "vertex: "; std::cin >> vertex;
+    try {
+        std::cout << "inbound edges:\n";
+        for (auto it = graphs[index].second.inbound_begin(vertex); it != graphs[index].second.inbound_end(vertex); ++it)
+            std::cout << *it << "\n";
+        std::cout << "\n";
+    } catch (std::out_of_range& e) {
+        std::cout << "vertex does not exist\n";
+    }
+}
+
+void get_edge_cost(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int from, to;
+    std::cout << "vertex1: "; std::cin >> from;
+    std::cout << "vertex2: "; std::cin >> to;
+    try {
+        int cost = graphs[index].second.get_edge_cost(from, to);
+        std::cout << "cost: " << cost << "\n";
+    } catch (std::out_of_range& e) {
+        std::cout << "edge does not exist\n";
+    }
+}
+
+void modify_edge_cost(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int from, to, cost;
+    std::cout << "vertex1: "; std::cin >> from;
+    std::cout << "vertex2: "; std::cin >> to;
+    std::cout << "cost: "; std::cin >> cost;
+    try {
+        graphs[index].second.modify_edge_cost(from, to, cost);
+        std::cout << "cost modified\n";
+    } catch (std::out_of_range& e) {
+        std::cout << "edge does not exist\n";
+    }
+}
+
+void add_vertex(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int vertex;
+    std::cout << "vertex: "; std::cin >> vertex;
+    if (graphs[index].second.add_vertex(vertex)) std::cout << "vertex added\n";
+    else std::cout << "vertex already exists\n";
+}
+
+void remove_vertex(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int vertex;
+    std::cout << "vertex: "; std::cin >> vertex;
+    if (graphs[index].second.remove_vertex(vertex)) std::cout << "vertex removed\n";
+    else std::cout << "vertex does not exist\n";
+}
+
+void add_edge(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int from, to, cost;
+    std::cout << "vertex1: "; std::cin >> from;
+    std::cout << "vertex2: "; std::cin >> to;
+    std::cout << "cost: "; std::cin >> cost;
+    try {
+        bool temp = graphs[index].second.add_edge(from, to, cost);
+        if (temp == false) std::cout << "edge already exists, modified its cost\n";
+        else std::cout << "edge added\n";
+    } catch (std::out_of_range& e) {
+        std::cout << "vertex does not exist\n";
+    }
+}
+
+void remove_edge(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int from, to;
+    std::cout << "vertex1: "; std::cin >> from;
+    std::cout << "vertex2: "; std::cin >> to;
+    if (graphs[index].second.remove_edge(from, to)) std::cout << "edge removed\n";
+    else std::cout << "edge does not exist\n";
+}
+
+void create_copy(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    graphs.emplace_back(graphs[index].first + "_copy", graphs[index].second.copy_graph());
+}
+
+void read_graph_from_file(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    std::string filename;
+    std::cout << "filename: "; std::cin >> filename;
+    try {
+        graphs.emplace_back(filename, read_graph_from_file(filename));
+    } catch (std::exception& e) {
+        std::cout << "error reading graph from file: " << e.what() << "\n";
+    }
+}
+
+void write_graph_to_file(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    std::string filename;
+    std::cout << "filename: "; std::cin >> filename;
+    try {
+        write_graph_to_file(graphs[index].second, filename);
+    } catch (std::exception& e) {
+        std::cout << "error writing graph to file: " << e.what() << "\n";
+    }
+}
+
+void create_random_graph(std::vector<std::pair<std::string, DirectedGraph>>& graphs, int index) {
+    int vertex_count, edge_count;
+    std::cout << "vertex count: "; std::cin >> vertex_count;
+    std::cout << "edge count: "; std::cin >> edge_count;
+    try {
+        graphs.emplace_back("random_"+std::to_string(vertex_count)+"_"+std::to_string(edge_count), generate_random_graph(vertex_count, edge_count));
+    }
+    catch (std::exception& e) {
+        std::cout << "error creating random graph: " << e.what() << "\n";
+    }
 }
 
 void run_ui() {
@@ -59,26 +205,90 @@ void run_ui() {
         print_menu();
         int opt; std::cout << " >>> "; std::cin >> opt;
         switch(opt) {
-            case 0:
+            case 0: {
                 return;
+            }
             case 1: {
                 int temp = switch_graph(graphs, index);
                 if(temp != -1) index = temp;
+                break;
             }
             case 2: {
                 get_number_of_vertices(graphs, index);
+                break;
+            }
+            case 3: {
+                parse_vertices(graphs, index);
+                break;
+            }
+            case 4: {
+                check_if_edge_exists(graphs, index);
+                break;
+            }
+            case 5: {
+                get_degrees(graphs, index);
+                break;
+            }
+            case 6: {
+                parse_outbound(graphs, index);
+                break;
+            }
+            case 7: {
+                parse_inbound(graphs, index);
+                break;
+            }
+            case 8: {
+                get_edge_cost(graphs, index);
+                break;
+            }
+            case 9: {
+                modify_edge_cost(graphs, index);
+                break;
+            }
+            case 10: {
+                add_vertex(graphs, index);
+                break;
+            }
+            case 11: {
+                remove_vertex(graphs, index);
+                break;
+            }
+            case 12: {
+                add_edge(graphs, index);
+                break;
+            }
+            case 13: {
+                remove_edge(graphs, index);
+                break;
+            }
+            case 14: {
+                create_copy(graphs, index);
+                break;
+            }
+            case 15: {
+                read_graph_from_file(graphs, index);
+                break;
+            }
+            case 16: {
+                write_graph_to_file(graphs, index);
+                break;
+            }
+            case 17: {
+                create_random_graph(graphs, index);
+                break;
+            }
+            default: {
+                std::cout << "please enter a valid option\n";
+                break;
             }
         }
     }
 }
 
 int main() {
-    //test_graph();
-    DirectedGraph g(5);
-    g.remove_vertex(4);
-    g.remove_vertex(3);
-    g.add_edge(1, 2, 5);
-    write_graph_to_file(g, "test.txt");
+    test_graph();
+    std::cout << "tests ran succesfully\n\n";
+    run_ui();
     system("pause");
     return 0;
 }

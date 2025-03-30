@@ -32,12 +32,12 @@ bool DirectedGraph::is_edge(int from, int to) const {
 }
 
 int DirectedGraph::in_degree(const int vertex) {
-    if (d_in.count(vertex) == 0) return -1;
+    if (d_in.count(vertex) == 0) throw std::out_of_range("Vertex not found");
     return d_in[vertex].size();
 }
 
 int DirectedGraph::out_degree(const int vertex) {
-    if (d_out.count(vertex) == 0) return -1;
+    if (d_out.count(vertex) == 0) throw std::out_of_range("Vertex not found");
     return d_out[vertex].size();
 }
 
@@ -100,13 +100,18 @@ bool DirectedGraph::add_vertex(int vertex) {
 
 bool DirectedGraph::remove_vertex(int vertex) {
     if (d_in.count(vertex) == 0) return false;
-    for (const auto& out_vertex : d_out[vertex]) {
-        costs.erase({vertex, out_vertex});
-        std::remove(d_in[out_vertex].begin(), d_in[out_vertex].end(), vertex);
+    for (auto& [from, to_list] : d_out) {
+        to_list.erase(std::remove(to_list.begin(), to_list.end(), vertex), to_list.end());
     }
-    for (const auto& in_vertex : d_in[vertex]) {
-        costs.erase({in_vertex, vertex});
-        std::remove(d_out[in_vertex].begin(), d_out[in_vertex].end(), vertex);
+    for (auto& [to, from_list] : d_in) {
+        from_list.erase(std::remove(from_list.begin(), from_list.end(), vertex), from_list.end());
+    }
+    for (auto it = costs.begin(); it != costs.end();) {
+        if (it->first.first == vertex || it->first.second == vertex) {
+            it = costs.erase(it);
+        } else {
+            ++it;
+        }
     }
     d_in.erase(vertex);
     d_out.erase(vertex);
@@ -171,4 +176,17 @@ void write_graph_to_file(DirectedGraph &graph, const std::string &filename) {
             f << vertex << " " << to << " " << graph.get_edge_cost(vertex, to) << "\n";
         }
     }
+}
+
+DirectedGraph generate_random_graph(const int& vertex_count, const int& edge_count) {
+    if(edge_count > vertex_count * vertex_count)
+        throw std::logic_error("Too many edges");
+    DirectedGraph g(vertex_count);
+    for (int i = 0; i < edge_count; ++i) {
+        int from = rand() % vertex_count;
+        int to = rand() % vertex_count;
+        int cost = rand() % 100 + 1;
+        g.add_edge(from, to, cost);
+    }
+    return g;
 }

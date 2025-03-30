@@ -47,3 +47,4 @@ public:
 
 DirectedGraph read_graph_from_file(const std::string& filename);
 void write_graph_to_file(DirectedGraph& graph, const std::string& filename);
+DirectedGraph generate_random_graph(const int& vertex_count, const int& edge_count);
