@@ -1,5 +1,7 @@
 #include "DirectedGraph.h"
 #include <iostream>
+#include <fstream>
+#include <sstream>
 
 DirectedGraph::DirectedGraph(const int vertex_count) {
     for (int i=0; i<vertex_count; i++) {
@@ -23,14 +25,6 @@ DirectedGraph::DirectedGraph(DirectedGraph const& other) {
 
 int DirectedGraph::vertex_count() const {
     return d_in.size();
-}
-
-DirectedGraph::VertexIterator DirectedGraph::vertices_begin() {
-    return d_in.cbegin();
-}
-
-DirectedGraph::VertexIterator DirectedGraph::vertices_end() {
-    return d_in.cend();
 }
 
 bool DirectedGraph::is_edge(int from, int to) const {
@@ -114,6 +108,8 @@ bool DirectedGraph::remove_vertex(int vertex) {
         costs.erase({in_vertex, vertex});
         std::remove(d_out[in_vertex].begin(), d_out[in_vertex].end(), vertex);
     }
+    d_in.erase(vertex);
+    d_out.erase(vertex);
     return true;
 }
 
@@ -123,4 +119,56 @@ DirectedGraph DirectedGraph::copy_graph() const {
     copy.d_out = d_out;
     copy.costs = costs;
     return copy;
+}
+
+DirectedGraph read_graph_from_file(const std::string& filename) {
+    std::ifstream f(filename);
+    if(!f.is_open()) throw std::runtime_error("File not found");
+    std::string line; f >> line;
+    if(line == "nodelist") {
+        f.ignore();
+        std::getline(f, line);
+        std::vector<int> nodes;
+        std::istringstream iss(line);
+        int node;
+        while (iss >> node) {
+            nodes.push_back(node);
+            //std::cout << node << " ";
+        }
+        std::cout << std::endl;
+        DirectedGraph g(nodes);
+        while (std::getline(f, line)) {
+            std::istringstream iss2(line);
+            int from, to, cost;
+            if (iss2 >> from >> to >> cost) {
+                g.add_edge(from, to, cost);
+                //std::cout << from << " " << to << " " << cost << std::endl;
+            }
+        }
+        return g;
+    }
+    int vertex_count = std::stoi(line);
+    int edge_count; f >> edge_count;
+    DirectedGraph g(vertex_count);
+    for(int i=0; i<edge_count; i++) {
+        int from, to, cost;
+        f >> from >> to >> cost;
+        g.add_edge(from, to, cost);
+    }
+    return g;
+}
+
+void write_graph_to_file(DirectedGraph &graph, const std::string &filename) {
+    std::ofstream f(filename);
+    f << "nodelist\n";
+    for (auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it)
+        f << *it << " ";
+    f << "\n";
+    for (auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it) {
+        int vertex = *it;
+        for (auto out_it = graph.outbound_begin(vertex); out_it != graph.outbound_end(vertex); ++out_it) {
+            int to = *out_it;
+            f << vertex << " " << to << " " << graph.get_edge_cost(vertex, to) << "\n";
+        }
+    }
 }

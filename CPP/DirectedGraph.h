@@ -9,17 +9,26 @@ private:
     std::map<int, std::vector<int>> d_in;
     std::map<int, std::vector<int>> d_out;
     std::map<std::pair<int, int>, int> costs;
+
+    class VertexIterator {
+    private:
+        std::map<int, std::vector<int>>::const_iterator it;
+    public:
+        explicit VertexIterator(std::map<int, std::vector<int>>::const_iterator map_it) : it(map_it) {}
+        VertexIterator& operator++() { ++it; return *this; }
+        bool operator!=(const VertexIterator& other) const { return it != other.it; }
+        int operator*() const { return it->first; }
+    };
 public:
     DirectedGraph() = default;
     explicit DirectedGraph(int vertex_count);
     explicit DirectedGraph(std::vector<int> vertices);
     DirectedGraph(const DirectedGraph& other);
 
-    using VertexIterator = std::map<int, std::vector<int>>::const_iterator;
     using EdgeIterator = std::vector<int>::const_iterator;
     int vertex_count() const;
-    VertexIterator vertices_begin();
-    VertexIterator vertices_end();
+    VertexIterator vertices_begin() const { return VertexIterator(d_in.cbegin()); }
+    VertexIterator vertices_end() const { return VertexIterator(d_in.cend()); }
     bool is_edge(int from, int to) const;
     int in_degree(int vertex);
     int out_degree(int vertex);
@@ -35,3 +44,6 @@ public:
     bool remove_vertex(int vertex);
     DirectedGraph copy_graph() const;
 };
+
+DirectedGraph read_graph_from_file(const std::string& filename);
+void write_graph_to_file(DirectedGraph& graph, const std::string& filename);
