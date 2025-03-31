@@ -43,6 +43,7 @@ public:
     bool add_vertex(int vertex);
     bool remove_vertex(int vertex);
     DirectedGraph copy_graph() const;
+    DirectedGraph& operator=(const DirectedGraph& other);
 };
 
 DirectedGraph read_graph_from_file(const std::string& filename);

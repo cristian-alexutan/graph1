@@ -127,6 +127,15 @@ DirectedGraph DirectedGraph::copy_graph() const {
     return copy;
 }
 
+DirectedGraph & DirectedGraph::operator=(const DirectedGraph& other) {
+    if (this != &other) {
+        d_in = other.d_in;
+        d_out = other.d_out;
+        costs = other.costs;
+    }
+    return *this;
+}
+
 DirectedGraph read_graph_from_file(const std::string& filename) {
     std::ifstream f(filename);
     if(!f.is_open()) throw std::runtime_error("File not found");
