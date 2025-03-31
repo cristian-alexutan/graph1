@@ -151,11 +151,19 @@ def read_graph_from_file(filename: str) -> "DirectedGraph":
 
 def write_graph_to_file(filename: str, g: "DirectedGraph") -> None:
     with open(filename, "w") as f:
-        print("nodelist", file = f)
-        nodes = ""
+        ok = True
         for x in g.vertices():
-            nodes = nodes + f"{x} "
-        print(nodes, file = f)
+            if x >= g.vertice_count():
+                ok = False
+                break
+        if ok:
+            print(f"{g.vertice_count()} {g.edge_count()}", file = f)
+        else:
+            print("nodelist", file = f)
+            nodes = ""
+            for x in g.vertices():
+                nodes = nodes + f"{x} "
+            print(nodes, file = f)
         for vertex1 in g.vertices():
             for vertex2 in g.outbound(vertex1):
                 print(f"{vertex1} {vertex2} {g.get_cost(vertex1, vertex2)}", file = f)
