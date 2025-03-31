@@ -28,6 +28,10 @@ int DirectedGraph::vertex_count() const {
     return d_in.size();
 }
 
+int DirectedGraph::edge_count() const {
+    return costs.size();
+}
+
 bool DirectedGraph::is_edge(int from, int to) const {
     return costs.count({from, to}) > 0;
 }
@@ -175,10 +179,20 @@ DirectedGraph read_graph_from_file(const std::string& filename) {
 
 void write_graph_to_file(DirectedGraph &graph, const std::string &filename) {
     std::ofstream f(filename);
-    f << "nodelist\n";
-    for (auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it)
-        f << *it << " ";
-    f << "\n";
+    bool ok = true;
+    for(auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it)
+        if(*it >= graph.vertex_count()) {
+            ok = false;
+            break;
+        }
+    if(ok)
+        f << graph.vertex_count() << " " << graph.edge_count() << "\n";
+    else {
+        f << "nodelist\n";
+        for (auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it)
+            f << *it << " ";
+        f << "\n";
+    }
     for (auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it) {
         int vertex = *it;
         for (auto out_it = graph.outbound_begin(vertex); out_it != graph.outbound_end(vertex); ++out_it) {

@@ -27,6 +27,7 @@ public:
 
     using EdgeIterator = std::vector<int>::const_iterator;
     int vertex_count() const;
+    int edge_count() const;
     VertexIterator vertices_begin() const { return VertexIterator(d_in.cbegin()); }
     VertexIterator vertices_end() const { return VertexIterator(d_in.cend()); }
     bool is_edge(int from, int to) const;
