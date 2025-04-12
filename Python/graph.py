@@ -50,7 +50,6 @@ class DirectedGraph:
         if vertex2 not in self._d_in:
             raise GraphError("vertex doesn't exist")
         if (vertex1, vertex2) in self._costs:
-            self._costs[(vertex1, vertex2)] = cost
             return False
         self._costs[(vertex1, vertex2)] = cost
         self._d_out[vertex1].append(vertex2)

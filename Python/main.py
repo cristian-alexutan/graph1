@@ -138,7 +138,7 @@ def add_edge(graphs: list, index: int):
     try:
         ans = graphs[index][1].add_edge(vertex1, vertex2, cost)
         if not ans:
-            print(f"edge already exists, modified cost to {cost}")
+            print("edge already exists")
     except GraphError as e:
         print(e)
 
