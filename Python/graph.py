@@ -137,7 +137,9 @@ def read_graph_from_file(filename: str) -> "DirectedGraph":
             g.add_vertex(vertex1)
             g.add_vertex(vertex2)
             g.add_edge(vertex1, vertex2, cost)
+            g.add_edge(vertex2, vertex1, cost) # FOR ASSIGNMENT 2, UNDIRECTED GRAPH
         iso = f.readline()
+        iso = iso.strip()
         if iso == "iso":
             line = f.readline()
             line = f.readline()
@@ -176,3 +178,43 @@ def random_graph(vertices: int, edges: int) -> "DirectedGraph":
         rez = g.add_edge(vertex1, vertex2, cost)
         count += rez
     return g
+
+def accessible(g: "DirectedGraph", node: int) -> set:
+    # returns the set of nodes accessible from the given node
+    if node not in g.vertices():
+        raise GraphError("node does not exist")
+    # acc is the set containing the accessible nodes
+    acc = set()
+    acc.add(node)
+    stack = [node]
+    # we use a stack to simulate DFS
+    while len(stack) > 0:
+        node = stack.pop()
+        # iterate through neighbours of the node
+        for out in g.outbound(node):
+            if out not in acc:
+                # if we have not already visited this node, add it to the set and stack
+                acc.add(out)
+                stack.append(out)
+    return acc
+
+def connected_components(g: "DirectedGraph") -> list:
+    # returns the connected components of the graph generated as graph objects
+    visited = set()
+    components = []
+    # iterate through all nodes
+    for node in g.vertices():
+        # if we found a node that has not been visited, we have found a new component
+        if node not in visited:
+            acc = accessible(g, node)
+            # get the nodes in the component and create the new graph object
+            comp = DirectedGraph()
+            for vertex in acc:
+                comp.add_vertex(vertex)
+                for vertex2 in g.outbound(vertex):
+                    if vertex2 in acc:
+                        comp.add_vertex(vertex2)
+                        comp.add_edge(vertex, vertex2, g.get_cost(vertex, vertex2))
+            components.append(comp)
+            visited.update(acc)
+    return components

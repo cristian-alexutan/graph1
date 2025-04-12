@@ -1,4 +1,4 @@
-from graph import DirectedGraph, GraphError, read_graph_from_file, write_graph_to_file, random_graph
+from graph import DirectedGraph, GraphError, read_graph_from_file, write_graph_to_file, random_graph, connected_components
 
 def print_menu():
     print()
@@ -19,6 +19,7 @@ def print_menu():
     print("15 - read graph from file")
     print("16 - write graph to file")
     print("17 - create random graph")
+    print("18 - get connected components")
     print("0 - exit")
     print("=========================================")
 
@@ -177,6 +178,19 @@ def create_random_graph(graphs: list, index: int):
     except GraphError as e:
         print(e)
 
+def get_connected_components(graphs: list, index: int):
+    g = graphs[index][1]
+    components = connected_components(g)
+    for i in range(len(components)):
+        print(f"component {i}: ")
+        nodes = ""
+        for node in components[i].vertices():
+            nodes += str(node) + " "
+        print(nodes)
+    for i in range(len(components)):
+        name = f"{graphs[index][0]}_comp_{i}"
+        graphs.append((name, components[i]))
+
 def main():
     options = {
         "2": get_number_of_vertices,
@@ -194,7 +208,8 @@ def main():
         "14": create_copy_of_graph,
         "15": read_from_file,
         "16": write_to_file,
-        "17": create_random_graph
+        "17": create_random_graph,
+        "18": get_connected_components
     }
 
     g = DirectedGraph()
