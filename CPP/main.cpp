@@ -288,7 +288,7 @@ void run_ui() {
 }
 
 int main() {
-    //test_graph();
+    test_graph();
     //std::cout << "tests ran succesfully\n\n";
     run_ui();
     system("pause");

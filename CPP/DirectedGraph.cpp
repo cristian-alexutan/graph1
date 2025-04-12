@@ -143,56 +143,31 @@ DirectedGraph & DirectedGraph::operator=(const DirectedGraph& other) {
 DirectedGraph read_graph_from_file(const std::string& filename) {
     std::ifstream f(filename);
     if(!f.is_open()) throw std::runtime_error("File not found");
-    std::string line; f >> line;
-    if(line == "nodelist") {
-        f.ignore();
-        std::getline(f, line);
-        std::vector<int> nodes;
-        std::istringstream iss(line);
-        int node;
-        while (iss >> node) {
-            nodes.push_back(node);
-            //std::cout << node << " ";
-        }
-        std::cout << std::endl;
-        DirectedGraph g(nodes);
-        while (std::getline(f, line)) {
-            std::istringstream iss2(line);
-            int from, to, cost;
-            if (iss2 >> from >> to >> cost) {
-                g.add_edge(from, to, cost);
-                //std::cout << from << " " << to << " " << cost << std::endl;
-            }
-        }
-        return g;
-    }
-    int vertex_count = std::stoi(line);
-    int edge_count; f >> edge_count;
-    DirectedGraph g(vertex_count);
+    int vertex_count, edge_count; f >> vertex_count >> edge_count;
+    DirectedGraph g;
     for(int i=0; i<edge_count; i++) {
         int from, to, cost;
         f >> from >> to >> cost;
+        g.add_vertex(from);
+        g.add_vertex(to);
         g.add_edge(from, to, cost);
     }
+    std::string line;
+    if(f >> line)
+        if(line == "iso") {
+            int cnt; f >> cnt;
+            for(int i=0; i<cnt; i++) {
+                int node; f >> node;
+                g.add_vertex(node);
+            }
+        }
     return g;
 }
 
 void write_graph_to_file(DirectedGraph &graph, const std::string &filename) {
     std::ofstream f(filename);
     bool ok = true;
-    for(auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it)
-        if(*it >= graph.vertex_count()) {
-            ok = false;
-            break;
-        }
-    if(ok)
-        f << graph.vertex_count() << " " << graph.edge_count() << "\n";
-    else {
-        f << "nodelist\n";
-        for (auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it)
-            f << *it << " ";
-        f << "\n";
-    }
+    f << graph.vertex_count() << " " << graph.edge_count() << "\n";
     for (auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it) {
         int vertex = *it;
         for (auto out_it = graph.outbound_begin(vertex); out_it != graph.outbound_end(vertex); ++out_it) {
@@ -200,6 +175,15 @@ void write_graph_to_file(DirectedGraph &graph, const std::string &filename) {
             f << vertex << " " << to << " " << graph.get_edge_cost(vertex, to) << "\n";
         }
     }
+    f << "iso\n";
+    int cnt = 0;
+    for(auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it)
+        if(graph.in_degree(*it) == 0 && graph.out_degree(*it) == 0)
+            cnt++;
+    f << cnt << "\n";
+    for(auto it = graph.vertices_begin(); it != graph.vertices_end(); ++it)
+        if(graph.in_degree(*it) == 0 && graph.out_degree(*it) == 0)
+            f << *it << " ";
 }
 
 std::random_device rd;
