@@ -184,18 +184,27 @@ def accessible(g: "DirectedGraph", node: int) -> set:
     if node not in g.vertices():
         raise GraphError("node does not exist")
     # acc is the set containing the accessible nodes
+    print(f"accessible({node})")
     acc = set()
     acc.add(node)
     stack = [node]
+    print("stack:", stack)
+    print("acc:", acc)
     # we use a stack to simulate DFS
     while len(stack) > 0:
         node = stack.pop()
         # iterate through neighbours of the node
+        print(f"node: {node}")
+        print("stack:", stack)
         for out in g.outbound(node):
+            print(f"out: {out}")
             if out not in acc:
                 # if we have not already visited this node, add it to the set and stack
                 acc.add(out)
                 stack.append(out)
+        print("stack:", stack)
+        print("acc:", acc)
+    print()
     return acc
 
 def connected_components(g: "DirectedGraph") -> list:
@@ -217,4 +226,7 @@ def connected_components(g: "DirectedGraph") -> list:
                         comp.add_edge(vertex, vertex2, g.get_cost(vertex, vertex2))
             components.append(comp)
             visited.update(acc)
+            print("acc:", acc)
+            print("visited:", visited)
+            print()
     return components
