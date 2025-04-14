@@ -122,47 +122,50 @@ def read_graph_from_file(filename: str) -> "DirectedGraph":
     except FileNotFoundError:
         raise GraphError(f"file {filename} not found")
     with open(filename, "r") as f:
-        line = f.readline()
-        line = line.strip()
-        tokens = line.split()
-        edges = int(tokens[1])
-        g = DirectedGraph()
-        for i in range(edges):
-            line = f.readline()
+        lines = f.readlines()
+        line1 = lines.pop(0)
+        line1 = line1.strip()
+        if line1 == "nodelist":
+            line1 = lines.pop(0)
+            line1.strip()
+            tokens = line1.split()
+            nodes = []
+            for node in tokens:
+                nodes.append(int(node))
+            g = DirectedGraph(nodes)
+        else:
+            tokens = line1.split()
+            vertices = int(tokens[0])
+            g = DirectedGraph(vertices)
+        for line in lines:
             line = line.strip()
+            if line == "":
+                continue
             tokens = line.split()
             vertex1 = int(tokens[0])
             vertex2 = int(tokens[1])
             cost = int(tokens[2])
-            g.add_vertex(vertex1)
-            g.add_vertex(vertex2)
             g.add_edge(vertex1, vertex2, cost)
-            g.add_edge(vertex2, vertex1, cost) # FOR ASSIGNMENT 2, UNDIRECTED GRAPH
-        iso = f.readline()
-        iso = iso.strip()
-        if iso == "iso":
-            line = f.readline()
-            line = f.readline()
-            for node in line.split():
-                node = int(node)
-                g.add_vertex(node)
         return g
 
 def write_graph_to_file(filename: str, g: "DirectedGraph") -> None:
     with open(filename, "w") as f:
-        f.write(f"{g.vertice_count()} {g.edge_count()}\n")
-        iso = []
+        ok = True
+        for x in g.vertices():
+            if x >= g.vertice_count():
+                ok = False
+                break
+        if ok:
+            print(f"{g.vertice_count()} {g.edge_count()}", file = f)
+        else:
+            print("nodelist", file = f)
+            nodes = ""
+            for x in g.vertices():
+                nodes = nodes + f"{x} "
+            print(nodes, file = f)
         for vertex1 in g.vertices():
-            if g.in_degree(vertex1) == 0 and g.out_degree(vertex1) == 0:
-                iso.append(vertex1)
             for vertex2 in g.outbound(vertex1):
-                f.write(f"{vertex1} {vertex2} {g.get_cost(vertex1, vertex2)}\n")
-        if len(iso) != 0:
-            f.write("iso\n")
-            f.write(f"{len(iso)}\n")
-            for node in iso:
-                f.write(f"{node} ")
-            f.write("\n")
+                print(f"{vertex1} {vertex2} {g.get_cost(vertex1, vertex2)}", file = f)
 
 def random_graph(vertices: int, edges: int) -> "DirectedGraph":
     if edges > vertices ** 2:
