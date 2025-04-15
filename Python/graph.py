@@ -146,6 +146,7 @@ def read_graph_from_file(filename: str) -> "DirectedGraph":
             vertex2 = int(tokens[1])
             cost = int(tokens[2])
             g.add_edge(vertex1, vertex2, cost)
+            g.add_edge(vertex2, vertex1, cost)
         return g
 
 def write_graph_to_file(filename: str, g: "DirectedGraph") -> None:
@@ -195,7 +196,8 @@ def accessible(g: "DirectedGraph", node: int) -> set:
     print("acc:", acc)
     # we use a stack to simulate DFS
     while len(stack) > 0:
-        node = stack.pop()
+        node = stack[len(stack)-1]
+        found = False
         # iterate through neighbours of the node
         print(f"node: {node}")
         print("stack:", stack)
@@ -205,6 +207,11 @@ def accessible(g: "DirectedGraph", node: int) -> set:
                 # if we have not already visited this node, add it to the set and stack
                 acc.add(out)
                 stack.append(out)
+                found = True
+                break
+        if not found:
+            # if we have visited all neighbours, remove the node from the stack
+            stack.pop()
         print("stack:", stack)
         print("acc:", acc)
     print()
