@@ -1,4 +1,4 @@
-from graph import DirectedGraph, GraphError, read_graph_from_file, write_graph_to_file, random_graph, connected_components
+from graph import DirectedGraph, GraphError, read_graph_from_file, write_graph_to_file, random_graph, connected_components, strongly_connected_components, biconnected_components
 
 def print_menu():
     print()
@@ -20,6 +20,8 @@ def print_menu():
     print("16 - write graph to file")
     print("17 - create random graph")
     print("18 - get connected components")
+    print("19 - get strongly connected components")
+    print("20 - get biconnected components")
     print("0 - exit")
     print("=========================================")
 
@@ -191,6 +193,32 @@ def get_connected_components(graphs: list, index: int):
         name = f"{graphs[index][0]}_comp_{i}"
         graphs.append((name, components[i]))
 
+def get_strongly_connected_components(graphs: list, index: int):
+    g = graphs[index][1]
+    components = strongly_connected_components(g)
+    for i in range(len(components)):
+        print(f"component {i}: ")
+        nodes = ""
+        for node in components[i].vertices():
+            nodes += str(node) + " "
+        print(nodes)
+    for i in range(len(components)):
+        name = f"{graphs[index][0]}_comp_{i}"
+        graphs.append((name, components[i]))
+
+def get_biconnected_components(graphs: list, index: int):
+    g = graphs[index][1]
+    components = biconnected_components(g)
+    for i in range(len(components)):
+        print(f"component {i}: ")
+        nodes = ""
+        for node in components[i].vertices():
+            nodes += str(node) + " "
+        print(nodes)
+    for i in range(len(components)):
+        name = f"{graphs[index][0]}_comp_{i}"
+        graphs.append((name, components[i]))
+
 def main():
     options = {
         "2": get_number_of_vertices,
@@ -209,7 +237,9 @@ def main():
         "15": read_from_file,
         "16": write_to_file,
         "17": create_random_graph,
-        "18": get_connected_components
+        "18": get_connected_components,
+        "19": get_strongly_connected_components,
+        "20": get_biconnected_components
     }
 
     g = DirectedGraph()

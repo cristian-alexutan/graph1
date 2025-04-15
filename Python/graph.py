@@ -240,3 +240,88 @@ def connected_components(g: "DirectedGraph") -> list:
             print("visited:", visited)
             print()
     return components
+
+def strongly_connected_components(g: "DirectedGraph") -> list:
+    # Tarjan's Algorithm for finding SCCs
+    index = 0
+    stack = []
+    indices = {}
+    lowlink = {}
+    on_stack = set()
+    components = []
+
+    def strongconnect(v):
+        nonlocal index
+        indices[v] = index
+        lowlink[v] = index
+        index += 1
+        stack.append(v)
+        on_stack.add(v)
+
+        for w in g.outbound(v):
+            if w not in indices:
+                strongconnect(w)
+                lowlink[v] = min(lowlink[v], lowlink[w])
+            elif w in on_stack:
+                lowlink[v] = min(lowlink[v], indices[w])
+
+        if lowlink[v] == indices[v]:
+            component = DirectedGraph()
+            while True:
+                w = stack.pop()
+                on_stack.remove(w)
+                component.add_vertex(w)
+                for x in g.outbound(w):
+                    if x in component.vertices():
+                        component.add_edge(w, x, g.get_cost(w, x))
+                if w == v:
+                    break
+            components.append(component)
+
+    for v in g.vertices():
+        if v not in indices:
+            strongconnect(v)
+
+    return components
+
+def biconnected_components(g: "DirectedGraph") -> list:
+    # returns the biconnected components of the graph generated as graph objects
+    visited = set()
+    stack = []
+    components = []
+    index = 0
+    indices = {}
+    lowlink = {}
+
+    def biconnected(v):
+        nonlocal index
+        indices[v] = index
+        lowlink[v] = index
+        index += 1
+        stack.append(v)
+        visited.add(v)
+
+        for w in g.outbound(v):
+            if w not in indices:
+                biconnected(w)
+                lowlink[v] = min(lowlink[v], lowlink[w])
+            elif w in stack:
+                lowlink[v] = min(lowlink[v], indices[w])
+
+        if lowlink[v] == indices[v]:
+            component = DirectedGraph()
+            while True:
+                w = stack.pop()
+                component.add_vertex(w)
+                for x in g.outbound(w):
+                    if x in component.vertices():
+                        component.add_edge(w, x, g.get_cost(w, x))
+                if w == v:
+                    break
+            components.append(component)
+
+    for v in g.vertices():
+        if v not in visited:
+            biconnected(v)
+
+    return components
