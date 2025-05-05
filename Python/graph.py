@@ -1,3 +1,4 @@
+import math
 from random import randint
 
 class GraphError(Exception):
@@ -325,3 +326,35 @@ def biconnected_components(g: "DirectedGraph") -> list:
             biconnected(v)
 
     return components
+
+def shortest_walk(g: DirectedGraph, u: int, v: int) -> list:
+    # Floyd Warshall algorith for shortest path between two nodes
+    # returns the shortest path between u and v
+    if u not in g.vertices() or v not in g.vertices():
+        raise GraphError("vertex does not exist")
+    dist = {}
+    next_node = {}
+    for i in g.vertices():
+        dist[(i, i)] = 0
+        next_node[(i, i)] = i
+        for j in g.vertices(i):
+            if g.is_edge(i, j):
+                dist[(i, j)] = g.get_cost(i, j)
+                next_node[(i, j)] = j
+            else:
+                dist[(i, j)] = math.inf
+                next_node[(i, j)] = None
+    for k in g.vertices():
+        for i in g.vertices():
+            for j in g.vertices():
+                if dist[(i, k)] + dist[(k, j)] < dist[(i, j)]:
+                    dist[(i, j)] = dist[(i, k)] + dist[(k, j)]
+                    next_node[(i, j)] = next_node[(i, k)]
+    if dist[(u, v)] == math.inf:
+        raise GraphError("no path exists")
+    path = []
+    while u != v:
+        path.append(u)
+        u = next_node[(u, v)]
+    path.append(v)
+    return path

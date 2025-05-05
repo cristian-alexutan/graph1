@@ -22,6 +22,7 @@ def print_menu():
     print("18 - get connected components")
     print("19 - get strongly connected components")
     print("20 - get biconnected components")
+    print("21 - get minimum cost walk")
     print("0 - exit")
     print("=========================================")
 
@@ -219,6 +220,17 @@ def get_biconnected_components(graphs: list, index: int):
         name = f"{graphs[index][0]}_comp_{i}"
         graphs.append((name, components[i]))
 
+def min_cost_walk(graphs: list, index: int):
+    g = graphs[index][1]
+    vertex1 = int(input("vertex1: "))
+    vertex2 = int(input("vertex2: "))
+    try:
+        cost, path = g.min_cost_walk(vertex1, vertex2)
+        print(f"cost: {cost}")
+        print(f"path: {path}")
+    except GraphError as e:
+        print(e)
+
 def main():
     options = {
         "2": get_number_of_vertices,
@@ -239,7 +251,8 @@ def main():
         "17": create_random_graph,
         "18": get_connected_components,
         "19": get_strongly_connected_components,
-        "20": get_biconnected_components
+        "20": get_biconnected_components,
+        "21": min_cost_walk
     }
 
     g = DirectedGraph()
